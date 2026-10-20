@@ -41,8 +41,28 @@ def create_app():
         """Создать администратора."""
         from app.models import User
         from werkzeug.security import generate_password_hash
-        with app.app_context():
-            db.create_all()
+        
+with app.app_context():
+    db.create_all()
+
+    import os
+    from app.models import User
+    from werkzeug.security import generate_password_hash
+
+    username = os.environ.get('BOOTSTRAP_ADMIN_USERNAME')
+    password = os.environ.get('BOOTSTRAP_ADMIN_PASSWORD')
+
+    if username and password:
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            user = User(
+                username=username,
+                password_hash=generate_password_hash(password),
+                role='admin'
+            )
+            db.session.add(user)
+            db.session.commit()
+
             if User.query.filter_by(username=username).first():
                 click.echo(f'Пользователь "{username}" уже существует.')
                 return
