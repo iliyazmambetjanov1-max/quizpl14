@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Игра — QuizPL14{% endblock %}
+{% block body_class %}page-player{% endblock %}
+
+{% block content %}
+
+<!-- ── ЛОББИ ─────────────────────────────────── -->
+<div class="player-screen" id="screen-lobby">
+    <div class="lobby-screen">
+        <div class="lobby-screen__avatar" id="player-avatar">😊</div>
+        <h2 class="lobby-screen__name" id="player-name-display"></h2>
+        <div class="lobby-screen__status">
+            <div class="pulse-dot"></div>
+            <span>Ожидаем начала игры...</span>
+        </div>
+        <p class="lobby-screen__count" id="lobby-count">0 игроков в комнате</p>
+    </div>
+</div>
+
+<!-- ── ВОПРОС ────────────────────────────────── -->
+<div class="player-screen" id="screen-question" style="display:none">
+    <div class="question-screen">
+        <div class="question-screen__header">
+            <div class="q-counter" id="q-counter">1 / 1</div>
+            <div class="timer-circle" id="timer-circle">
+                <svg viewBox="0 0 60 60">
+                    <circle class="timer-bg" cx="30" cy="30" r="26"/>
+                    <circle class="timer-fg" id="timer-ring" cx="30" cy="30" r="26"
+                            stroke-dasharray="163.4" stroke-dashoffset="0"/>
+                </svg>
+                <span class="timer-num" id="timer-num">20</span>
+            </div>
+        </div>
+        <h2 class="question-screen__text" id="q-text"></h2>
+        <div class="answer-grid" id="answer-grid">
+            <button class="answer-btn answer-btn--a" id="btn-a" data-option="a">
+                <span class="answer-btn__icon">🔺</span>
+                <span class="answer-btn__text" id="text-a"></span>
+            </button>
+            <button class="answer-btn answer-btn--b" id="btn-b" data-option="b">
+                <span class="answer-btn__icon">⬟</span>
+                <span class="answer-btn__text" id="text-b"></span>
+            </button>
+            <button class="answer-btn answer-btn--c" id="btn-c" data-option="c">
+                <span class="answer-btn__icon">⭕</span>
+                <span class="answer-btn__text" id="text-c"></span>
+            </button>
+            <button class="answer-btn answer-btn--d" id="btn-d" data-option="d">
+                <span class="answer-btn__icon">✦</span>
+                <span class="answer-btn__text" id="text-d"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── РЕЗУЛЬТАТ ОТВЕТА ───────────────────────── -->
+<div class="player-screen" id="screen-result" style="display:none">
+    <div class="result-screen">
+        <div class="result-screen__icon" id="result-icon">✅</div>
+        <h2 class="result-screen__verdict" id="result-verdict">Верно!</h2>
+        <div class="result-screen__points" id="result-points">+850</div>
+        <p class="result-screen__total">Всего очков: <strong id="result-total">850</strong></p>
+        <p class="result-screen__wait">Ожидайте следующий вопрос...</p>
+    </div>
+</div>
+
+<!-- ── ЛИДЕРБОРД ─────────────────────────────── -->
+<div class="player-screen" id="screen-leaderboard" style="display:none">
+    <div class="player-leaderboard">
+        <h2 class="player-leaderboard__title">🏆 Топ игроков</h2>
+        <div class="leaderboard-list" id="player-lb-list"></div>
+        <p class="player-leaderboard__wait">Следующий вопрос начнётся скоро...</p>
+    </div>
+</div>
+
+<!-- ── ФИНАЛ ────────────────────────────────── -->
+<div class="player-screen" id="screen-gameover" style="display:none">
+    <div class="player-gameover">
+        <div class="player-gameover__emoji">🎊</div>
+        <h1 class="player-gameover__title">Игра завершена!</h1>
+        <p class="player-gameover__score">Ваш итоговый счёт: <strong id="final-score"></strong></p>
+        <div class="leaderboard-list" id="final-lb-list"></div>
+        <a href="{{ url_for('game.join') }}" class="btn btn--accent btn--xl" style="margin-top:2rem">Играть снова</a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
+{% endblock %}

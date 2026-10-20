@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Вход — QuizPL14{% endblock %}
+{% block body_class %}page-auth{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <span class="logo-icon">⚡</span>
+            <h1 class="logo-text">QuizPL14</h1>
+            <p class="logo-sub">Панель ведущего</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form" id="login-form">
+            <div class="form-group">
+                <label for="username">Логин</label>
+                <input type="text" id="username" name="username" placeholder="Введите логин" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full" id="login-btn">
+                Войти в систему
+            </button>
+        </form>
+
+        <p class="auth-hint">Участник? <a href="{{ url_for('game.join') }}">Войти в игру →</a></p>
+    </div>
+</div>
+{% endblock %}

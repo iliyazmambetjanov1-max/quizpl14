@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{% if quiz %}Редактировать «{{ quiz.title }}»{% else %}Новая викторина{% endif %} — QuizPL14{% endblock %}
+{% block body_class %}page-admin{% endblock %}
+
+{% block content %}
+<header class="admin-header">
+    <div class="admin-header__logo"><span>⚡</span> QuizPL14</div>
+    <nav class="admin-header__nav">
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn--ghost btn--sm">← Мои викторины</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn--ghost btn--sm">Выйти</a>
+    </nav>
+</header>
+
+<main class="admin-main">
+    <div class="admin-container">
+
+        {% if not quiz %}
+        <!-- ── Форма создания новой викторины ── -->
+        <div class="page-header">
+            <h1 class="page-title">Новая викторина</h1>
+        </div>
+        <div class="card">
+            <form method="POST" action="{{ url_for('admin.quiz_new') }}" class="editor-form" id="new-quiz-form">
+                <div class="form-group">
+                    <label for="title">Название викторины</label>
+                    <input type="text" id="title" name="title" placeholder="Например: История России" required maxlength="128">
+                </div>
+                <button type="submit" class="btn btn--primary" id="save-quiz-btn">Создать и добавить вопросы →</button>
+            </form>
+        </div>
+
+        {% else %}
+        <!-- ── Редактор вопросов ── -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">{{ quiz.title }}</h1>
+                <p class="page-subtitle">{{ questions|length }} вопросов</p>
+            </div>
+            <a href="{{ url_for('admin.quiz_host', quiz_id=quiz.id) }}" class="btn btn--accent" id="host-btn">▶️ Запустить игру</a>
+        </div>
+
+        <!-- Список вопросов -->
+        {% if questions %}
+        <div class="questions-list" id="questions-list">
+            {% for q in questions %}
+            <div class="question-item" id="question-{{ q.id }}">
+                <div class="question-item__num">{{ loop.index }}</div>
+                <div class="question-item__body">
+                    <p class="question-item__text">{{ q.question_text }}</p>
+                    <div class="question-item__options">
+                        <span class="option option--a {% if q.correct_option == 'a' %}option--correct{% endif %}">A: {{ q.option_a }}</span>
+                        <span class="option option--b {% if q.correct_option == 'b' %}option--correct{% endif %}">B: {{ q.option_b }}</span>
+                        <span class="option option--c {% if q.correct_option == 'c' %}option--correct{% endif %}">C: {{ q.option_c }}</span>
+                        <span class="option option--d {% if q.correct_option == 'd' %}option--correct{% endif %}">D: {{ q.option_d }}</span>
+                    </div>
+                    <span class="question-item__meta">⏱ {{ q.time_limit }} сек.</span>
+                </div>
+                <form method="POST" action="{{ url_for('admin.question_delete', quiz_id=quiz.id, q_id=q.id) }}">
+                    <button type="submit" class="btn btn--danger btn--sm btn--icon" title="Удалить">🗑</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Форма добавления вопроса -->
+        <div class="card" id="add-question-card">
+            <h2 class="card__title">+ Добавить вопрос</h2>
+            <form method="POST" action="{{ url_for('admin.question_add', quiz_id=quiz.id) }}" class="editor-form" id="add-question-form">
+                <div class="form-group">
+                    <label for="question_text">Текст вопроса</label>
+                    <textarea id="question_text" name="question_text" rows="2" placeholder="Введите текст вопроса..." required maxlength="512"></textarea>
+                </div>
+                <div class="options-grid">
+                    <div class="form-group">
+                        <label class="label--a">🔴 Вариант A</label>
+                        <input type="text" name="option_a" placeholder="Ответ A" required maxlength="256">
+                    </div>
+                    <div class="form-group">
+                        <label class="label--b">🔵 Вариант B</label>
+                        <input type="text" name="option_b" placeholder="Ответ B" required maxlength="256">
+                    </div>
+                    <div class="form-group">
+                        <label class="label--c">🟡 Вариант C</label>
+                        <input type="text" name="option_c" placeholder="Ответ C" required maxlength="256">
+                    </div>
+                    <div class="form-group">
+                        <label class="label--d">🟢 Вариант D</label>
+                        <input type="text" name="option_d" placeholder="Ответ D" required maxlength="256">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="correct_option">Правильный ответ</label>
+                        <select id="correct_option" name="correct_option">
+                            <option value="a">A</option>
+                            <option value="b">B</option>
+                            <option value="c">C</option>
+                            <option value="d">D</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="time_limit">Лимит времени (сек)</label>
+                        <select id="time_limit" name="time_limit">
+                            <option value="10">10 секунд</option>
+                            <option value="20" selected>20 секунд</option>
+                            <option value="30">30 секунд</option>
+                            <option value="60">60 секунд</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn--primary" id="add-q-btn">Добавить вопрос</button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+</main>
+{% endblock %}

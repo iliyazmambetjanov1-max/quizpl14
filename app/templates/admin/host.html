@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Ведущий: {{ quiz.title }} — QuizPL14{% endblock %}
+{% block body_class %}page-host{% endblock %}
+
+{% block content %}
+<div class="host-layout">
+
+    <!-- Боковая панель ведущего -->
+    <aside class="host-sidebar">
+        <div class="host-sidebar__logo"><span>⚡</span> QuizPL14</div>
+        <div class="host-pin">
+            <p class="host-pin__label">PIN-код комнаты</p>
+            <div class="host-pin__code" id="pin-display">{{ session.pin }}</div>
+            <p class="host-pin__hint">Участники вводят на quizpl14.ru/join</p>
+        </div>
+        <div class="host-stats">
+            <div class="stat-box">
+                <span class="stat-box__val" id="player-count">0</span>
+                <span class="stat-box__label">Игроков</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-box__val" id="answered-count">0</span>
+                <span class="stat-box__label">Ответили</span>
+            </div>
+        </div>
+        <div class="host-controls">
+            <button class="btn btn--accent btn--full" id="start-btn">▶ Начать игру</button>
+            <button class="btn btn--primary btn--full" id="next-btn" style="display:none">Следующий вопрос →</button>
+            <button class="btn btn--secondary btn--full" id="leaderboard-btn" style="display:none">📊 Показать лидеров</button>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn--ghost btn--sm" style="margin-top:auto">← Выйти</a>
+    </aside>
+
+    <!-- Главная область -->
+    <main class="host-main">
+
+        <!-- Состояние лобби -->
+        <div class="host-screen" id="screen-lobby">
+            <div class="lobby-waiting">
+                <div class="lobby-waiting__icon">🎮</div>
+                <h1 class="lobby-waiting__title">{{ quiz.title }}</h1>
+                <p class="lobby-waiting__subtitle">Ожидание участников...</p>
+                <div class="lobby-players" id="lobby-player-list"></div>
+            </div>
+        </div>
+
+        <!-- Экран вопроса -->
+        <div class="host-screen" id="screen-question" style="display:none">
+            <div class="host-question">
+                <div class="host-question__progress" id="q-progress">Вопрос 1 из {{ quiz.question_count() }}</div>
+                <h2 class="host-question__text" id="q-text"></h2>
+                <div class="host-answers">
+                    <div class="host-answer host-answer--a"><span>A</span><span id="opt-a"></span></div>
+                    <div class="host-answer host-answer--b"><span>B</span><span id="opt-b"></span></div>
+                    <div class="host-answer host-answer--c"><span>C</span><span id="opt-c"></span></div>
+                    <div class="host-answer host-answer--d"><span>D</span><span id="opt-d"></span></div>
+                </div>
+                <div class="host-timer">
+                    <div class="host-timer__bar" id="timer-bar"></div>
+                    <span class="host-timer__val" id="timer-val">20</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран лидерборда -->
+        <div class="host-screen" id="screen-leaderboard" style="display:none">
+            <div class="leaderboard-panel">
+                <h2 class="leaderboard-panel__title">🏆 Таблица лидеров</h2>
+                <div class="leaderboard-list" id="leaderboard-list"></div>
+            </div>
+        </div>
+
+        <!-- Финальный экран -->
+        <div class="host-screen" id="screen-gameover" style="display:none">
+            <div class="gameover-panel">
+                <div class="gameover-panel__emoji">🎉</div>
+                <h1 class="gameover-panel__title">Игра завершена!</h1>
+                <div class="leaderboard-list" id="final-leaderboard"></div>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn--primary" style="margin-top:2rem">← На главную</a>
+            </div>
+        </div>
+
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const PIN = "{{ session.pin }}";
+    const TOTAL_QUESTIONS = {{ quiz.question_count() }};
+</script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

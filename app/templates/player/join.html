@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Войти в игру — QuizPL14{% endblock %}
+{% block body_class %}page-player{% endblock %}
+
+{% block content %}
+<div class="player-wrapper">
+    <div class="player-card" id="join-card">
+        <div class="player-logo">
+            <span class="logo-icon">⚡</span>
+            <h1 class="logo-text">QuizPL14</h1>
+        </div>
+
+        <form class="join-form" id="join-form" novalidate>
+            <div class="form-group">
+                <label for="pin-input">PIN-код игры</label>
+                <input type="text" id="pin-input" name="pin"
+                       placeholder="000000"
+                       maxlength="6"
+                       inputmode="numeric"
+                       pattern="\d{6}"
+                       autocomplete="off"
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="nickname-input">Ваш никнейм</label>
+                <input type="text" id="nickname-input" name="nickname"
+                       placeholder="Введите имя"
+                       maxlength="32"
+                       autocomplete="off"
+                       required>
+            </div>
+            <div class="join-error" id="join-error" style="display:none"></div>
+            <button type="submit" class="btn btn--accent btn--full btn--xl" id="join-btn">
+                Войти в игру
+            </button>
+        </form>
+
+        <p class="auth-hint">Ведущий? <a href="{{ url_for('auth.login') }}">Панель администратора →</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
+{% endblock %}

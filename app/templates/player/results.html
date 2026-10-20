@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Результаты — QuizPL14{% endblock %}
+{% block body_class %}page-player{% endblock %}
+{% block content %}
+<div class="player-wrapper">
+  <div class="player-card" style="text-align:center">
+    <div class="logo-icon">🎊</div>
+    <h1 class="logo-text">Игра окончена</h1>
+    <p style="color:var(--text-muted);margin-top:1rem">Проверьте итоги на экране ведущего.</p>
+    <a href="{{ url_for('game.join') }}" class="btn btn--accent btn--xl" style="margin-top:1.5rem">Играть снова</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Мои викторины — QuizPL14{% endblock %}
+{% block body_class %}page-admin{% endblock %}
+
+{% block content %}
+<header class="admin-header">
+    <div class="admin-header__logo">
+        <span>⚡</span> QuizPL14
+    </div>
+    <nav class="admin-header__nav">
+        <span class="admin-header__user">{{ current_user.username }}</span>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn--ghost btn--sm">Выйти</a>
+    </nav>
+</header>
+
+<main class="admin-main">
+    <div class="admin-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Мои викторины</h1>
+                <p class="page-subtitle">Создавайте и управляйте тестами</p>
+            </div>
+            <a href="{{ url_for('admin.quiz_new') }}" class="btn btn--primary" id="create-quiz-btn">
+                + Новая викторина
+            </a>
+        </div>
+
+        {% if quizzes %}
+        <div class="quiz-grid">
+            {% for quiz in quizzes %}
+            <div class="quiz-card" id="quiz-card-{{ quiz.id }}">
+                <div class="quiz-card__icon">📋</div>
+                <div class="quiz-card__body">
+                    <h2 class="quiz-card__title">{{ quiz.title }}</h2>
+                    <p class="quiz-card__meta">{{ quiz.question_count() }} вопросов · {{ quiz.created_at.strftime('%d.%m.%Y') }}</p>
+                </div>
+                <div class="quiz-card__actions">
+                    <a href="{{ url_for('admin.quiz_edit', quiz_id=quiz.id) }}" class="btn btn--secondary btn--sm">✏️ Редактировать</a>
+                    <a href="{{ url_for('admin.quiz_host', quiz_id=quiz.id) }}" class="btn btn--accent btn--sm">▶️ Запустить</a>
+                    <form method="POST" action="{{ url_for('admin.quiz_delete', quiz_id=quiz.id) }}" onsubmit="return confirm('Удалить викторину «{{ quiz.title }}»?')">
+                        <button type="submit" class="btn btn--danger btn--sm">🗑</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state__icon">📝</div>
+            <h2 class="empty-state__title">Пока нет викторин</h2>
+            <p class="empty-state__text">Создайте первую викторину и начните проводить игры!</p>
+            <a href="{{ url_for('admin.quiz_new') }}" class="btn btn--primary">+ Создать викторину</a>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
