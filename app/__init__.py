@@ -32,10 +32,12 @@ def create_app():
     from app.auth.routes import auth_bp
     from app.admin.routes import admin_bp
     from app.game.routes import game_bp
+    from app.api.routes import api_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(game_bp)
+    app.register_blueprint(api_bp)
 
     from app.sockets import events  # noqa: F401
 

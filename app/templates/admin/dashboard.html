@@ -1,57 +1,255 @@
+
 {% extends "base.html" %}
-{% block title %}Мои викторины — QuizPL14{% endblock %}
+
+{% block title %}Панель администратора — QuizPL14{% endblock %}
+
 {% block body_class %}page-admin{% endblock %}
 
 {% block content %}
-<header class="admin-header">
-    <div class="admin-header__logo">
-        <span>⚡</span> QuizPL14
-    </div>
-    <nav class="admin-header__nav">
-        <span class="admin-header__user">{{ current_user.username }}</span>
-        <a href="{{ url_for('auth.logout') }}" class="btn btn--ghost btn--sm">Выйти</a>
-    </nav>
-</header>
 
-<main class="admin-main">
-    <div class="admin-container">
-        <div class="page-header">
-            <div>
-                <h1 class="page-title">Мои викторины</h1>
-                <p class="page-subtitle">Создавайте и управляйте тестами</p>
+{% set ns = namespace(total_questions=0) %}
+{% for quiz in quizzes %}
+    {% set ns.total_questions = ns.total_questions + quiz.question_count() %}
+{% endfor %}
+
+<div class="admin-layout">
+
+    <!-- БОКОВОЕ МЕНЮ -->
+    <aside class="admin-sidebar">
+
+        <a href="{{ url_for('admin.dashboard') }}" class="sidebar-brand">
+            <span class="brand-icon">Q</span>
+            <span>QuizPL14</span>
+        </a>
+
+        <div class="sidebar-label">ГЛАВНОЕ МЕНЮ</div>
+
+        <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link active">
+            <span>▦</span>
+            <span>Обзор</span>
+        </a>
+
+        <a href="{{ url_for('admin.quiz_new') }}" class="sidebar-link">
+            <span>＋</span>
+            <span>Создать викторину</span>
+        </a>
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+                <div class="user-avatar">
+                    {{ current_user.username[0]|upper }}
+                </div>
+
+                <div class="sidebar-user-info">
+                    <strong>{{ current_user.username }}</strong>
+                    <small>Администратор</small>
+                </div>
             </div>
-            <a href="{{ url_for('admin.quiz_new') }}" class="btn btn--primary" id="create-quiz-btn">
-                + Новая викторина
+
+            <a href="{{ url_for('auth.logout') }}" class="sidebar-logout">
+                <span>↪</span>
+                Выйти из аккаунта
             </a>
+
         </div>
 
-        {% if quizzes %}
-        <div class="quiz-grid">
-            {% for quiz in quizzes %}
-            <div class="quiz-card" id="quiz-card-{{ quiz.id }}">
-                <div class="quiz-card__icon">📋</div>
-                <div class="quiz-card__body">
-                    <h2 class="quiz-card__title">{{ quiz.title }}</h2>
-                    <p class="quiz-card__meta">{{ quiz.question_count() }} вопросов · {{ quiz.created_at.strftime('%d.%m.%Y') }}</p>
-                </div>
-                <div class="quiz-card__actions">
-                    <a href="{{ url_for('admin.quiz_edit', quiz_id=quiz.id) }}" class="btn btn--secondary btn--sm">✏️ Редактировать</a>
-                    <a href="{{ url_for('admin.quiz_host', quiz_id=quiz.id) }}" class="btn btn--accent btn--sm">▶️ Запустить</a>
-                    <form method="POST" action="{{ url_for('admin.quiz_delete', quiz_id=quiz.id) }}" onsubmit="return confirm('Удалить викторину «{{ quiz.title }}»?')">
-                        <button type="submit" class="btn btn--danger btn--sm">🗑</button>
-                    </form>
-                </div>
+    </aside>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="admin-content">
+
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+        <header class="admin-topbar">
+
+            <div class="topbar-welcome">
+                <span class="topbar-label">ПАНЕЛЬ УПРАВЛЕНИЯ</span>
+
+                <h1>Добро пожаловать!</h1>
+
+                <p>
+                    Управляйте своими викторинами в одном месте.
+                </p>
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <div class="empty-state__icon">📝</div>
-            <h2 class="empty-state__title">Пока нет викторин</h2>
-            <p class="empty-state__text">Создайте первую викторину и начните проводить игры!</p>
-            <a href="{{ url_for('admin.quiz_new') }}" class="btn btn--primary">+ Создать викторину</a>
-        </div>
-        {% endif %}
-    </div>
-</main>
+
+            <a href="{{ url_for('admin.quiz_new') }}" class="admin-create-btn">
+                <span>＋</span>
+                Новая викторина
+            </a>
+
+        </header>
+
+        <!-- СТАТИСТИКА -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple">
+                    ▦
+                </div>
+
+                <div>
+                    <span>Всего викторин</span>
+                    <strong>{{ quizzes|length }}</strong>
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    ?
+                </div>
+
+                <div>
+                    <span>Всего вопросов</span>
+                    <strong>{{ ns.total_questions }}</strong>
+                </div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    ⚡
+                </div>
+
+                <div>
+                    <span>Статус системы</span>
+                    <strong class="online-status">Активна</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- СПИСОК ВИКТОРИН -->
+        <section class="quiz-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Мои викторины</h2>
+                    <p>Все созданные вами тесты</p>
+                </div>
+
+                <span class="quiz-count">
+                    {{ quizzes|length }} шт.
+                </span>
+
+            </div>
+
+            {% if quizzes %}
+
+                <div class="quiz-grid">
+
+                    {% for quiz in quizzes %}
+
+                        <article class="quiz-card" id="quiz-card-{{ quiz.id }}">
+
+                            <div class="quiz-card-top">
+
+                                <div class="quiz-icon">
+                                    📝
+                                </div>
+
+                                <span class="quiz-badge">
+                                    Викторина
+                                </span>
+
+                            </div>
+
+                            <h3>{{ quiz.title }}</h3>
+
+                            <div class="quiz-info">
+
+                                <span>
+                                    ❓ {{ quiz.question_count() }} вопросов
+                                </span>
+
+                                <span>
+                                    📅 {{ quiz.created_at.strftime('%d.%m.%Y') }}
+                                </span>
+
+                            </div>
+
+                            <div class="quiz-actions">
+
+                                <a
+                                    href="{{ url_for('admin.quiz_edit', quiz_id=quiz.id) }}"
+                                    class="quiz-action edit-action"
+                                >
+                                    ✏️ Редактировать
+                                </a>
+
+                                <a
+                                    href="{{ url_for('admin.quiz_host', quiz_id=quiz.id) }}"
+                                    class="quiz-action play-action"
+                                >
+                                    ▶ Запустить
+                                </a>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('admin.quiz_delete', quiz_id=quiz.id) }}"
+                                    onsubmit="return confirm('Вы действительно хотите удалить эту викторину?')"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="delete-action"
+                                        title="Удалить викторину"
+                                        aria-label="Удалить викторину"
+                                    >
+                                        🗑
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <!-- ЕСЛИ ВИКТОРИН ПОКА НЕТ -->
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        📝
+                    </div>
+
+                    <h2>Пока нет викторин</h2>
+
+                    <p>
+                        Создайте свою первую викторину
+                        и начните проводить интерактивные игры!
+                    </p>
+
+                    <a
+                        href="{{ url_for('admin.quiz_new') }}"
+                        class="admin-create-btn"
+                    >
+                        ＋ Создать викторину
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        <!-- ПОДВАЛ -->
+        <footer class="admin-footer">
+            QuizPL14 © 2026 · Панель администратора
+        </footer>
+
+    </main>
+
+</div>
+
 {% endblock %}
