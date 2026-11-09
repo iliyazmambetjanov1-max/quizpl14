@@ -86,8 +86,10 @@
 
 {% block scripts %}
 <script>
-    const PIN = "{{ session.pin }}";
-    const TOTAL_QUESTIONS = {{ quiz.question_count() }};
+    const PIN = {{ session.pin | tojson }};
+    const HOST_TOKEN = {{ host_token | tojson }};
+    const TOTAL_QUESTIONS = {{ quiz.question_count() | tojson }};
 </script>
+
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}

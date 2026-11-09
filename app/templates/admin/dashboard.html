@@ -1,7 +1,7 @@
 
 {% extends "base.html" %}
 
-{% block title %}Панель администратора — QuizPL14{% endblock %}
+{% block title %}Мои викторины — QuizPL14{% endblock %}
 
 {% block body_class %}page-admin{% endblock %}
 
@@ -26,7 +26,7 @@
 
         <a href="{{ url_for('admin.dashboard') }}" class="sidebar-link active">
             <span>▦</span>
-            <span>Обзор</span>
+            <span>Мои викторины</span>
         </a>
 
         <a href="{{ url_for('admin.quiz_new') }}" class="sidebar-link">
@@ -34,41 +34,20 @@
             <span>Создать викторину</span>
         </a>
 
-        <div class="sidebar-bottom">
-
-            <div class="sidebar-user">
-                <div class="user-avatar">
-                    {{ current_user.username[0]|upper }}
-                </div>
-
-                <div class="sidebar-user-info">
-                    <strong>{{ current_user.username }}</strong>
-                    <small>Администратор</small>
-                </div>
-            </div>
-
-            <a href="{{ url_for('auth.logout') }}" class="sidebar-logout">
-                <span>↪</span>
-                Выйти из аккаунта
-            </a>
-
-        </div>
-
     </aside>
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <main class="admin-content">
 
-        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
         <header class="admin-topbar">
 
             <div class="topbar-welcome">
                 <span class="topbar-label">ПАНЕЛЬ УПРАВЛЕНИЯ</span>
 
-                <h1>Добро пожаловать!</h1>
+                <h1>Мои викторины</h1>
 
                 <p>
-                    Управляйте своими викторинами в одном месте.
+                    Создавайте викторины и проводите игры в реальном времени.
                 </p>
             </div>
 
@@ -83,42 +62,27 @@
         <section class="stats-grid">
 
             <div class="stat-card">
-
-                <div class="stat-icon purple">
-                    ▦
-                </div>
-
+                <div class="stat-icon purple">▦</div>
                 <div>
                     <span>Всего викторин</span>
                     <strong>{{ quizzes|length }}</strong>
                 </div>
-
             </div>
 
             <div class="stat-card">
-
-                <div class="stat-icon blue">
-                    ?
-                </div>
-
+                <div class="stat-icon blue">?</div>
                 <div>
                     <span>Всего вопросов</span>
                     <strong>{{ ns.total_questions }}</strong>
                 </div>
-
             </div>
 
             <div class="stat-card">
-
-                <div class="stat-icon green">
-                    ⚡
-                </div>
-
+                <div class="stat-icon green">⚡</div>
                 <div>
                     <span>Статус системы</span>
                     <strong class="online-status">Активна</strong>
                 </div>
-
             </div>
 
         </section>
@@ -127,7 +91,6 @@
         <section class="quiz-section">
 
             <div class="section-heading">
-
                 <div>
                     <h2>Мои викторины</h2>
                     <p>Все созданные вами тесты</p>
@@ -136,7 +99,6 @@
                 <span class="quiz-count">
                     {{ quizzes|length }} шт.
                 </span>
-
             </div>
 
             {% if quizzes %}
@@ -145,17 +107,15 @@
 
                     {% for quiz in quizzes %}
 
+                        {% set owner_key = session.get('quiz_owner_tokens', {}).get(quiz.id|string, '') %}
+
                         <article class="quiz-card" id="quiz-card-{{ quiz.id }}">
 
                             <div class="quiz-card-top">
 
-                                <div class="quiz-icon">
-                                    📝
-                                </div>
+                                <div class="quiz-icon">📝</div>
 
-                                <span class="quiz-badge">
-                                    Викторина
-                                </span>
+                                <span class="quiz-badge">Викторина</span>
 
                             </div>
 
@@ -175,13 +135,15 @@
 
                             <div class="quiz-actions">
 
+                                <!-- РЕДАКТИРОВАНИЕ -->
                                 <a
-                                    href="{{ url_for('admin.quiz_edit', quiz_id=quiz.id) }}"
+                                    href="{{ url_for('admin.quiz_edit', quiz_id=quiz.id, key=owner_key) }}"
                                     class="quiz-action edit-action"
                                 >
                                     ✏️ Редактировать
                                 </a>
 
+                                <!-- ЗАПУСК -->
                                 <a
                                     href="{{ url_for('admin.quiz_host', quiz_id=quiz.id) }}"
                                     class="quiz-action play-action"
@@ -189,11 +151,18 @@
                                     ▶ Запустить
                                 </a>
 
+                                <!-- УДАЛЕНИЕ -->
                                 <form
                                     method="POST"
                                     action="{{ url_for('admin.quiz_delete', quiz_id=quiz.id) }}"
                                     onsubmit="return confirm('Вы действительно хотите удалить эту викторину?')"
                                 >
+
+                                    <input
+                                        type="hidden"
+                                        name="key"
+                                        value="{{ owner_key }}"
+                                    >
 
                                     <button
                                         type="submit"
@@ -216,12 +185,9 @@
 
             {% else %}
 
-                <!-- ЕСЛИ ВИКТОРИН ПОКА НЕТ -->
                 <div class="empty-state">
 
-                    <div class="empty-icon">
-                        📝
-                    </div>
+                    <div class="empty-icon">📝</div>
 
                     <h2>Пока нет викторин</h2>
 
@@ -243,9 +209,8 @@
 
         </section>
 
-        <!-- ПОДВАЛ -->
         <footer class="admin-footer">
-            QuizPL14 © 2026 · Панель администратора
+            QuizPL14 © 2026 · Панель управления
         </footer>
 
     </main>
